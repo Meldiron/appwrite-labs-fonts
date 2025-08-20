@@ -1,0 +1,20 @@
+name: Release to Appwrite Sites
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Cleanup code
+        run: rm -rf .github/
+      - name: Install Appwrite CLI
+        run: npm install -g appwrite-cli
+      - name: Authorize Appwrite CLI
+        run: appwrite client --endpoint="https://fra.cloud.appwrite.io/v1" --project-id="${{ secrets.APPWRITE_PROJECT_ID }}" --key="${{ secrets.APPWRITE_API_KEY }}"
+      - name: Deploy Site
+        run: appwrite sites create-deployment --site-id="${{ secrets.APPWRITE_SITE_ID }}" --activate="true" --code="./"
